@@ -22,7 +22,10 @@ def seed():
             Resource(organization_id=organizations[1].id, name="Housing navigation session", category="Housing", description="One on one support locating temporary housing", city="Cambridge", state="MA", quantity_available=4, eligibility="Open to Massachusetts residents"),
             Resource(organization_id=organizations[1].id, name="Legal consultation", category="Legal", description="Initial consultation with a volunteer advocate", city="Cambridge", state="MA", quantity_available=3, eligibility="Appointment required"),
         ])
-        db.add(User(email="demo@example.com", full_name="Demo User", password_hash=hash_password("demo-password"), role=UserRole.seeker))
+        db.add_all([
+            User(email="demo@example.com", full_name="Demo User", password_hash=hash_password("demo-password"), role=UserRole.seeker),
+            User(email="partner@example.com", full_name="Partner Manager", password_hash=hash_password("partner-password"), role=UserRole.organization_admin, organization_id=organizations[0].id),
+        ])
         db.commit()
 
 

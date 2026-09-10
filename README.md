@@ -12,6 +12,10 @@ The main engineering challenge is protecting limited availability when requests 
 * Token based authentication
 * Seeker organization administrator and platform administrator roles
 * Transaction protected reservations
+* Reservation history and cancellation
+* Waitlists for unavailable resources
+* Organization inventory management
+* Resource creation and quantity updates
 * Duplicate request protection
 * Audit events
 * Responsive React interface
@@ -43,6 +47,10 @@ Load the example organizations and resources with this command.
 docker compose exec backend python -m app.seed
 ```
 
+Use demo@example.com with demo-password to test the seeker experience.
+
+Use partner@example.com with partner-password to test organization inventory management.
+
 ## Run the backend tests
 
 ```bash
@@ -57,6 +65,6 @@ python -m pytest
 
 I use PostgreSQL in the complete environment because reservations require reliable transactions. SQLite remains available for simple local testing. I use PBKDF2 password hashing from the Python standard library. Access tokens expire after eight hours. The demonstration contains only synthetic organizations and resources.
 
-## Current limitations
+## Project scope
 
-This is a portfolio implementation rather than a production public benefits system. It does not store sensitive client records. Email delivery waitlists geospatial distance and cloud infrastructure are documented next steps rather than completed features.
+This is a portfolio implementation rather than a production public benefits system. It uses synthetic demonstration data and does not store sensitive client records. Email delivery geospatial distance monitoring and cloud infrastructure are appropriate production extensions.

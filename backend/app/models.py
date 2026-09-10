@@ -18,6 +18,12 @@ class ReservationStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class WaitlistStatus(str, enum.Enum):
+    waiting = "waiting"
+    offered = "offered"
+    closed = "closed"
+
+
 class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -62,6 +68,16 @@ class Reservation(Base):
     resource_id: Mapped[int] = mapped_column(ForeignKey("resources.id"), index=True)
     idempotency_key: Mapped[str] = mapped_column(String(80))
     status: Mapped[ReservationStatus] = mapped_column(Enum(ReservationStatus))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+
+
+class WaitlistEntry(Base):
+    __tablename__ = "waitlist_entries"
+    __table_args__ = (UniqueConstraint("user_id", "resource_id", name="uq_waitlist_user_resource"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resources.id"), index=True)
+    status: Mapped[WaitlistStatus] = mapped_column(Enum(WaitlistStatus), default=WaitlistStatus.waiting)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
 
 

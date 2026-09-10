@@ -5,10 +5,10 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, get_db
-from .models import Organization, Resource, User, UserRole
-from .schemas import HealthView, ReservationCreate, ReservationView, ResourceCreate, ResourceView, Token, UserCreate, UserView
+from .models import Organization, Reservation, Resource, User, UserRole, WaitlistEntry
+from .schemas import HealthView, ReservationCreate, ReservationView, ResourceCreate, ResourceUpdate, ResourceView, Token, UserCreate, UserView, WaitlistCreate, WaitlistView
 from .security import create_token, current_user, hash_password, require_roles, verify_password
-from .services import reserve_resource
+from .services import cancel_reservation, join_waitlist, reserve_resource
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Community Resource Exchange API", version="1.0.0")
@@ -69,6 +69,48 @@ def create_resource(payload: ResourceCreate, user: User = Depends(require_roles(
     return resource
 
 
+@app.patch("/resources/{resource_id}", response_model=ResourceView)
+def update_resource(resource_id: int, payload: ResourceUpdate, user: User = Depends(require_roles(UserRole.organization_admin, UserRole.platform_admin)), db: Session = Depends(get_db)):
+    resource = db.get(Resource, resource_id)
+    if not resource:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    if user.role != UserRole.platform_admin and resource.organization_id != user.organization_id:
+        raise HTTPException(status_code=403, detail="Resource belongs to another organization")
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(resource, field, value)
+    db.commit()
+    db.refresh(resource)
+    return resource
+
+
+@app.get("/organization/resources", response_model=list[ResourceView])
+def organization_resources(user: User = Depends(require_roles(UserRole.organization_admin, UserRole.platform_admin)), db: Session = Depends(get_db)):
+    statement = select(Resource).where(Resource.organization_id == user.organization_id).order_by(Resource.name)
+    return list(db.scalars(statement))
+
+
 @app.post("/reservations", response_model=ReservationView, status_code=201)
 def create_reservation(payload: ReservationCreate, user: User = Depends(current_user), db: Session = Depends(get_db)):
     return reserve_resource(db, user, payload.resource_id, payload.idempotency_key)
+
+
+@app.get("/reservations/me", response_model=list[ReservationView])
+def my_reservations(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    rows = db.execute(select(Reservation, Resource.name).join(Resource).where(Reservation.user_id == user.id).order_by(Reservation.created_at.desc())).all()
+    return [ReservationView.model_validate(item).model_copy(update={"resource_name": name}) for item, name in rows]
+
+
+@app.post("/reservations/{reservation_id}/cancel", response_model=ReservationView)
+def cancel_my_reservation(reservation_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return cancel_reservation(db, user, reservation_id)
+
+
+@app.post("/waitlist", response_model=WaitlistView, status_code=201)
+def create_waitlist_entry(payload: WaitlistCreate, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    return join_waitlist(db, user, payload.resource_id)
+
+
+@app.get("/waitlist/me", response_model=list[WaitlistView])
+def my_waitlist(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    rows = db.execute(select(WaitlistEntry, Resource.name).join(Resource).where(WaitlistEntry.user_id == user.id).order_by(WaitlistEntry.created_at.desc())).all()
+    return [WaitlistView.model_validate(item).model_copy(update={"resource_name": name}) for item, name in rows]

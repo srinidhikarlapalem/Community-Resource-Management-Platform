@@ -1,4 +1,4 @@
-# Community Resource Exchange
+# Community Resource Management Platform
 
 I built this application to make limited community services easier to find and safer to reserve. It connects people seeking support with verified organizations that manage food housing transportation and legal resources.
 

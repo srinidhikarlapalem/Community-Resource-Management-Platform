@@ -12,8 +12,15 @@ from .services import cancel_reservation, join_waitlist, reserve_resource
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Community Resource Exchange API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://srinidhikarlapalem.github.io",
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health", response_model=HealthView)
 def health(db: Session = Depends(get_db)):

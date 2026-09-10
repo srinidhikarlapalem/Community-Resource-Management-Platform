@@ -45,7 +45,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
   const [token, setToken] = useState(
-    localStorage.getItem("commonground_token") ?? "",
+    localStorage.getItem("community_resource_token") ?? "",
   );
   const [user, setUser] = useState<User | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -114,7 +114,7 @@ export default function App() {
     document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
   }
   function logout() {
-    localStorage.removeItem("commonground_token");
+    localStorage.removeItem("community_resource_token");
     setToken("");
     setUser(null);
     setAccountOpen(false);
@@ -137,7 +137,7 @@ export default function App() {
           body: form,
         });
       }
-      localStorage.setItem("commonground_token", data.access_token);
+      localStorage.setItem("community_resource_token", data.access_token);
       setToken(data.access_token);
       setAuthOpen(false);
       setNotice("You are signed in");
@@ -258,7 +258,7 @@ export default function App() {
     <main>
       <header>
         <a className="brand" href="#">
-          <HeartHandshake /> CommonGround
+          <HeartHandshake /> Community Resource Platform
         </a>
         <nav>
           <a href="#results">Find support</a>
@@ -398,7 +398,7 @@ export default function App() {
         </div>
       </section>
       <footer>
-        <HeartHandshake /> CommonGround{" "}
+        <HeartHandshake /> Community Resource Platform{" "}
         <span>Built for reliable access to community support</span>
       </footer>
       {authOpen && (

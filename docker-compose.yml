@@ -1,0 +1,33 @@
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: resources
+      POSTGRES_USER: resources
+      POSTGRES_PASSWORD: local-development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resources"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  backend:
+    build: ./backend
+    command: sh -c "python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://resources:local-development@database:5432/resources
+      SECRET_KEY: local-development-secret-change-me
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+volumes:
+  postgres_data:

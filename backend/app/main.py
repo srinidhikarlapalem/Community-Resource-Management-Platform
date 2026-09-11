@@ -22,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health", response_model=HealthView)
 def health(db: Session = Depends(get_db)):
     db.scalar(select(1))

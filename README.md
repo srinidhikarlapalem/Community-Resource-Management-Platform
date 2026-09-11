@@ -7,13 +7,15 @@ The main engineering challenge is protecting limited availability when requests 
 ## What the application includes
 
 * Resource search by category and city
+* Detailed service views with eligibility location availability and next steps
 * Availability tracking
 * Account registration and secure password hashing
 * Token based authentication
 * Seeker organization administrator and platform administrator roles
 * Transaction protected reservations
-* Reservation history and cancellation
+* Confirmation references plus reservation history and cancellation
 * Waitlists for unavailable resources
+* Visible waitlist history
 * Organization inventory management
 * Resource creation and quantity updates
 * Duplicate request protection

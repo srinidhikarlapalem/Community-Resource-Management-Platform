@@ -1,14 +1,17 @@
 # Community Resource Management Platform
 
-I built this application to make limited community services easier to find and safer to reserve. It connects people seeking support with verified organizations that manage food housing transportation and legal resources.
+I built this application to make Greater Boston community services easier to find and understand. It connects people with official food housing healthcare transportation legal and family support resources while preserving a complete demonstration backend for account and inventory workflows.
 
 The main engineering challenge is protecting limited availability when requests arrive at the same time. The reservation service uses a database transaction and row level lock. An idempotency key prevents a repeated request from creating a duplicate reservation.
 
 ## What the application includes
 
-* Resource search by category and city
-* Detailed service views with eligibility location availability and next steps
-* Availability tracking
+* Search across Boston Cambridge Somerville Chelsea and Greater Boston
+* Verified provider directory with official organization links
+* Filters for service type location and access format
+* Detailed service views with eligibility location contact options and next steps
+* Saved resources and shareable listings
+* Emergency guidance for 911 988 and Massachusetts 211
 * Account registration and secure password hashing
 * Token based authentication
 * Seeker organization administrator and platform administrator roles
